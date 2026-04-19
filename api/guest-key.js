@@ -53,8 +53,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const key1 = process.env.YOUTUBE_API_KEY1 || '';
-  const key2 = process.env.YOUTUBE_API_KEY2 || '';
+  const key1 = process.env.API_KEY1 || '';
+  const key2 = process.env.API_KEY2 || '';
 
   if (!key1 && !key2) {
     console.error('[guest-key] 환경변수 YOUTUBE_API_KEY1, YOUTUBE_API_KEY2 미설정');
