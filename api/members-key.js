@@ -49,7 +49,7 @@ function clearFail(ip) {
   failMap.delete(ip);
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   /* ── CORS ── */
   const allowedOrigin = process.env.GUEST_ALLOWED_ORIGIN || req.headers.origin || '*';
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
