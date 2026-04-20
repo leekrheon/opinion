@@ -5,8 +5,8 @@
  * 클라이언트는 토큰만 보관하며, 키 자체는 복호화 불가합니다.
  *
  * Vercel 환경변수:
- *   YOUTUBE_API_KEY1  — 기본 게스트 키
- *   YOUTUBE_API_KEY2  — 폴백 키 (선택)
+ *   API_KEY1  — 게스트 키1
+ *   API_KEY2  — 게스트 키2
  *   SESSION_SECRET    — 암호화 비밀키 (필수, openssl rand -hex 32)
  */
 
@@ -14,8 +14,8 @@ import { encrypt } from './_crypto.js';
 
 async function pickValidKey() {
   const candidates = [
-    process.env.YOUTUBE_API_KEY1,
-    process.env.YOUTUBE_API_KEY2,
+    process.env.API_KEY1,
+    process.env.API_KEY2,
   ].filter(Boolean);
 
   for (const key of candidates) {
