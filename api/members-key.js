@@ -3,7 +3,7 @@
  *
  * Vercel 환경변수:
  *   MEMBERS_PIN          — 4자리 코드
- *   MEMBERS_YOUTUBE_KEY  — 멤버스 전용 YouTube API 키
+ *   API_KEY_IMBY  — 멤버스 전용 YouTube API 키
  *   SESSION_SECRET       — 암호화 비밀키 (필수)
  */
 
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   }
 
   const validPin   = process.env.MEMBERS_PIN;
-  const membersKey = process.env.MEMBERS_YOUTUBE_KEY;
+  const membersKey = process.env.API_KEY_IMBYY;
 
   if (!validPin || !membersKey) {
     return res.status(503).json({ error: '멤버스 서비스가 설정되지 않았습니다.' });
