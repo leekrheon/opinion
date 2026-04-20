@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 
   const key = await pickValidKey();
   if (!key) {
-    return res.status(503).json({ error: '게스트 서비스가 일시적으로 사용 불가합니다.' });
+    return res.status(503).json({ error: '죄송합니다. 잠시 후 다시 사용해주세요.' });
   }
 
   const session = encrypt(key);
