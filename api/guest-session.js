@@ -5,8 +5,8 @@
  * 세션 토큰만 발급합니다.
  *
  * Vercel 환경변수:
- *   YOUTUBE_API_KEY1  — 기본 게스트 키
- *   YOUTUBE_API_KEY2  — 할당량 초과 시 폴백 키 (선택)
+ *   API_KEY1  — 게스트 키1
+ *   API_KEY2  — 게스트 키2
  */
 
 import crypto from 'crypto';
@@ -29,8 +29,8 @@ function issueSession(key) {
 
 async function pickValidKey() {
   const candidates = [
-    process.env.YOUTUBE_API_KEY1,
-    process.env.YOUTUBE_API_KEY2,
+    process.env.API_KEY1,
+    process.env.API_KEY2,
   ].filter(Boolean);
 
   for (const key of candidates) {
