@@ -22,10 +22,10 @@ export default async function handler(req, res) {
   }
 
   const validPin   = process.env.MEMBERS_PIN;
-  const membersKey = process.env.API_KEY_IMBYY;
+  const membersKey = process.env.API_KEY_IMBY;
 
   if (!validPin || !membersKey) {
-    return res.status(503).json({ error: '멤버스 서비스가 설정되지 않았습니다.' });
+    return res.status(503).json({ error: '관리자에게 문의하세요.' });
   }
 
   // 타이밍 공격 방지
