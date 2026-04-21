@@ -7,17 +7,11 @@ export async function GET(req: Request) {
   }
 
   try {
-    const now = new Date()
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-
+    // 실시간 접속자 API
     const analyticsRes = await fetch(
-      `https://vercel.com/api/web/insights/stats/visitors?` +
+      `https://vercel.com/api/web/insights/stats/current-visitors?` +
       new URLSearchParams({
         projectId: process.env.VERCEL_PROJECT_ID!,
-        from: oneHourAgo.toISOString(),
-        to: now.toISOString(),
-        tz: 'Asia/Seoul',
-        environment: 'production',
       }),
       {
         headers: {
@@ -27,37 +21,39 @@ export async function GET(req: Request) {
     )
 
     const data = await analyticsRes.json()
-    const visitors = data?.total ?? 0
+    const visitors = data?.count ?? 0
 
-    // 방문자 수에 따라 다른 메시지
     let message = ''
     let priority = 'default'
-    let tags = 'chart_increasing'
+    let tags = 'eyes'
 
     if (visitors >= 20) {
-      message = `🔥 와! 지난 1시간 방문자 ${visitors}명!`
+      message = `🔥 지금 ${visitors}명이 사이트 보고 있어요!`
       priority = 'urgent'
-      tags = 'fire,chart_increasing'
+      tags = 'fire'
     } else if (visitors >= 10) {
-      message = `🚀 지난 1시간 방문자 ${visitors}명!`
+      message = `🚀 지금 ${visitors}명이 접속 중!`
       priority = 'high'
-      tags = 'rocket,chart_increasing'
+      tags = 'rocket'
     } else if (visitors >= 5) {
-      message = `😊 지난 1시간 방문자 ${visitors}명`
+      message = `😊 지금 ${visitors}명이 접속 중`
       priority = 'default'
+      tags = 'smile'
     } else if (visitors >= 3) {
-      message = `👀 지난 1시간 방문자 ${visitors}명`
+      message = `👀 지금 ${visitors}명이 접속 중`
       priority = 'default'
+      tags = 'eyes'
     } else if (visitors >= 1) {
-      message = `🙂 지난 1시간 방문자 ${visitors}명`
+      message = `🙂 지금 ${visitors}명이 사이트에 있어요`
       priority = 'low'
+      tags = 'slightly_smiling_face'
     }
 
     if (visitors >= 1) {
       await fetch(`https://ntfy.sh/${process.env.NTFY_TOPIC}`, {
         method: 'POST',
         headers: {
-          Title: 'Vercel 방문자 알림',
+          Title: '실시간 접속자 알림',
           Priority: priority,
           Tags: tags,
           'Content-Type': 'text/plain; charset=utf-8',
