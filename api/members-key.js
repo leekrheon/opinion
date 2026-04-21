@@ -3,7 +3,7 @@
  *
  * Vercel 환경변수:
  *   MEMBERS_PIN          — 4자리 코드
- *   API_KEY_IMBY  — 멤버스 전용 YouTube API 키
+ *   MEMBERS_YOUTUBE_KEY  — 멤버스 전용 YouTube API 키
  *   SESSION_SECRET       — 암호화 비밀키 (필수)
  */
 
@@ -22,18 +22,17 @@ export default async function handler(req, res) {
   }
 
   const validPin   = process.env.MEMBERS_PIN;
-  const membersKey = process.env.API_KEY_IMBY;
+  const membersKey = process.env.MEMBERS_YOUTUBE_KEY;
 
   if (!validPin || !membersKey) {
-    return res.status(503).json({ error: '관리자에게 문의하세요.' });
+    return res.status(503).json({ error: '멤버스 서비스가 설정되지 않았습니다.' });
   }
 
-  // 타이밍 공격 방지
-  const inputBuf = Buffer.from(code.padEnd(8));
-  const validBuf = Buffer.from(validPin.padEnd(8));
-  const isValid  =
-    inputBuf.length === validBuf.length &&
-    crypto.timingSafeEqual(inputBuf, validBuf);
+  // SHA-256으로 해시해 길이를 고정한 뒤 상수 시간 비교
+  // → 입력 길이가 달라도 타이밍 정보가 새지 않음
+  const inputHash = crypto.createHash('sha256').update(code).digest();
+  const validHash = crypto.createHash('sha256').update(validPin).digest();
+  const isValid   = crypto.timingSafeEqual(inputHash, validHash);
 
   if (!isValid) {
     return res.status(401).json({ error: '코드가 올바르지 않습니다.' });

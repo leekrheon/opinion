@@ -5,8 +5,8 @@
  * 클라이언트는 토큰만 보관하며, 키 자체는 복호화 불가합니다.
  *
  * Vercel 환경변수:
- *   API_KEY1  — 게스트 키1
- *   API_KEY2  — 게스트 키2
+ *   YOUTUBE_API_KEY1  — 기본 게스트 키
+ *   YOUTUBE_API_KEY2  — 폴백 키 (선택)
  *   SESSION_SECRET    — 암호화 비밀키 (필수, openssl rand -hex 32)
  */
 
@@ -14,8 +14,8 @@ import { encrypt } from './_crypto.js';
 
 async function pickValidKey() {
   const candidates = [
-    process.env.API_KEY1,
-    process.env.API_KEY2,
+    process.env.YOUTUBE_API_KEY1,
+    process.env.YOUTUBE_API_KEY2,
   ].filter(Boolean);
 
   for (const key of candidates) {
@@ -25,7 +25,11 @@ async function pickValidKey() {
       );
       const d = await r.json();
       if (!d.error) return key;
-    } catch (_) {}
+    } catch (e) {
+      // 에러 로그에서 API 키가 노출되지 않도록 마스킹
+      const safeMsg = (e.message || '').replace(/key=[^&\s]+/gi, 'key=REDACTED');
+      console.error('[pickValidKey] candidate failed:', safeMsg);
+    }
   }
   return null;
 }
@@ -37,7 +41,7 @@ export default async function handler(req, res) {
 
   const key = await pickValidKey();
   if (!key) {
-    return res.status(503).json({ error: '죄송합니다. 잠시 후 다시 사용해주세요.' });
+    return res.status(503).json({ error: '게스트 서비스가 일시적으로 사용 불가합니다.' });
   }
 
   const session = encrypt(key);
