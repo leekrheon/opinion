@@ -1,0 +1,69 @@
+name: Realtime Visitor Alert
+
+on:
+  schedule:
+    - cron: '* * * * *'  # 매 1분마다
+  workflow_dispatch:  # 수동 실행 버튼
+
+jobs:
+  check-visitors:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check & Alert
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          python3 << 'EOF'
+          import urllib.request
+          import urllib.parse
+          import json
+          import os
+
+          token = os.environ['VERCEL_TOKEN']
+          project_id = os.environ['VERCEL_PROJECT_ID']
+          ntfy_topic = os.environ['NTFY_TOPIC']
+
+          # 실시간 접속자 가져오기
+          params = urllib.parse.urlencode({'projectId': project_id})
+          req = urllib.request.Request(
+            f'https://vercel.com/api/web/insights/stats/current-visitors?{params}',
+            headers={'Authorization': f'Bearer {token}'}
+          )
+          with urllib.request.urlopen(req) as res:
+            data = json.loads(res.read())
+
+          visitors = data.get('count', 0)
+          print(f'현재 접속자: {visitors}명')
+
+          if visitors >= 1:
+            if visitors >= 20:
+              message = f'🔥 지금 {visitors}명이 사이트 보고 있어요!'
+              priority = 'urgent'
+            elif visitors >= 10:
+              message = f'🚀 지금 {visitors}명이 접속 중!'
+              priority = 'high'
+            elif visitors >= 5:
+              message = f'😊 지금 {visitors}명이 접속 중'
+              priority = 'default'
+            elif visitors >= 3:
+              message = f'👀 지금 {visitors}명이 접속 중'
+              priority = 'default'
+            else:
+              message = f'🙂 지금 {visitors}명이 사이트에 있어요'
+              priority = 'low'
+
+            ntfy_req = urllib.request.Request(
+              f'https://ntfy.sh/{ntfy_topic}',
+              data=message.encode('utf-8'),
+              headers={
+                'Title': '실시간 접속자 알림',
+                'Priority': priority,
+                'Tags': 'eyes',
+              },
+              method='POST'
+            )
+            urllib.request.urlopen(ntfy_req)
+            print('알림 전송 완료!')
+          EOF
