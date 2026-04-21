@@ -7,7 +7,7 @@
  * Vercel 환경변수:
  *   API_KEY1  — 게스트 키
  *   API_KEY2  — 게스트 키(비상용)
- *   SESSION_SECRET    — 암호화 비밀키 (필수, openssl rand -hex 32)
+ *   SESSION_SECRET    — 비밀키 (필수, openssl rand -hex 32)
  */
 
 import { encrypt } from './_crypto.js';
