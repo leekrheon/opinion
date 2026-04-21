@@ -28,7 +28,7 @@ jobs:
           # 실시간 접속자 가져오기
           params = urllib.parse.urlencode({'projectId': project_id})
           req = urllib.request.Request(
-            f'https://vercel.com/api/web/insights/stats/current-visitors?{params}',
+            f'https://vercel.com/api/web/insights/stats/realtime?{params}',
             headers={'Authorization': f'Bearer {token}'}
           )
           with urllib.request.urlopen(req) as res:
