@@ -1,0 +1,8 @@
+json{
+  "crons": [
+    {
+      "path": "/api/cron/analytics",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
